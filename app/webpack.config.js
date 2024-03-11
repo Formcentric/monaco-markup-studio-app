@@ -15,7 +15,7 @@ module.exports = (env) => {
       filename: "bundle.js",
     },
     optimization: {
-      minimize: true,
+      minimize: mode === 'production',
     },
     plugins: [
       new webpack.ProgressPlugin({
