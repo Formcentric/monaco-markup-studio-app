@@ -1,18 +1,19 @@
 import React, {useEffect, useRef, useState} from 'react'
 
 import {
-  Box,
   ChakraProvider,
   Container,
   HStack,
   Select,
-  Text, useToast
+  useToast
 } from '@chakra-ui/react'
 import {createWorkAreaServiceDescriptor} from "@coremedia/studio-client.form-services-api/WorkAreaServiceDescriptor";
 
 import {ContentCard} from "./ContentCard";
+import {DiffVersions} from "./DiffVersions";
 import {EmptyWorkAreaCard} from "./EmptyWorkAreaCard";
 import {Nav} from "./Nav";
+import {NoMarkupView} from "./NoMarkupView";
 
 import {DiffEditor} from '@monaco-editor/react';
 import {editor} from "monaco-editor/esm/vs/editor/editor.api";
@@ -191,6 +192,8 @@ export function App() {
     updateEditor('', '');
   }, [activeContentId]);
 
+  const showEditor = !!(activeContent && activeProperty);
+
   return (
           <ChakraProvider>
             <Nav/>
@@ -210,10 +213,12 @@ export function App() {
                 </Select>
               }
             </Container>
-            <Box py='2' />
-            <Text>Links: {originalVersionNumber}     ----------     Rechts: {originalVersionNumber + 1} {checkedOut && '*'}</Text>
-            <DiffEditor height="80vh" language="xml" keepCurrentOriginalModel={true}
-                    onMount={handleEditorDidMount} options={EDITOR_OPTIONS} />
+            <Container maxWidth='100vw' display={showEditor ? 'inherit' : 'none'}>
+              <DiffVersions originalVersionNumber={originalVersionNumber} checkedOut={checkedOut} />
+              <DiffEditor height="80vh" language="xml" keepCurrentOriginalModel={true}
+                      onMount={handleEditorDidMount} options={EDITOR_OPTIONS} />
+            </Container>
+            {!showEditor && <NoMarkupView />}
           </ChakraProvider>
   );
 }
