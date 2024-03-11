@@ -54,7 +54,7 @@
     "dist"
   ],
   "jangaroo": {
-    "appName": "studio-client.monaco",
-    "appPath": "apps/monaco"
+    "appName": "studio-client.monaco-markup",
+    "appPath": "apps/monaco-markup"
   }
 }
