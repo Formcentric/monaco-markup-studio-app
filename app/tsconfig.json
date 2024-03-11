@@ -23,5 +23,5 @@
     "types": [
     ]
   },
-  "files": ["index.tsx"]
+  "files": ["src/index.tsx"]
 }

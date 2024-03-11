@@ -7,7 +7,7 @@ const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 module.exports = (env) => {
   const { mode = "development" } = env;
   return {
-    entry: "./index.tsx",
+    entry: "./src/index.tsx",
     mode: mode,
     stats: "errors-only",
     output: {
