@@ -1,0 +1,26 @@
+{
+  "cmKey": "fcMonacoMarkup",
+  "short_name": "Monaco Markup",
+  "name": "Monaco Markup",
+  "icons": [
+    {
+      "src": "appIcons/monaco-markup.svg",
+      "type": "image/svg",
+      "sizes": "24x24"
+    },
+    {
+      "src": "appIcons/monaco-markup-96.png",
+      "type": "image/png",
+      "sizes": "96x96"
+    }
+  ],
+  "categories": [
+    "Monaco"
+  ],
+  "cmServices": [],
+  "cmEmbeddableServices": [],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#000000",
+  "background_color": "#ffffff"
+}

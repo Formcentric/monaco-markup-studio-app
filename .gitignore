@@ -1,0 +1,9 @@
+# NodeJS
+node_modules/
+.npmrc
+
+# Jangaroo Build
+dist/
+build/
+
+.DS_Store

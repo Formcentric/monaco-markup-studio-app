@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "jsx": "react",
+    "module": "es6",
+    "target": "esnext",
+    "sourceMap": true,
+    "newLine": "LF",
+    "declaration": true,
+    "useDefineForClassFields": true,
+    "noImplicitOverride": true,
+    "esModuleInterop": true,
+    "moduleResolution": "NodeNext",
+    "resolveJsonModule": true,
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "es5",
+      "es6",
+      "esnext"
+    ],
+    "incremental": true,
+    "composite": false,
+    "types": [
+    ]
+  },
+  "files": ["index.tsx"]
+}
