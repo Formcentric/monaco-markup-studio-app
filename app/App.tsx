@@ -18,6 +18,7 @@ import {
 import {ExternalLinkIcon} from '@chakra-ui/icons';
 import {createWorkAreaServiceDescriptor} from "@coremedia/studio-client.form-services-api/WorkAreaServiceDescriptor";
 import {ContentCard} from "./ContentCard";
+import {EmptyWorkAreaCard} from "./EmptyWorkAreaCard";
 
 import {DiffEditor} from '@monaco-editor/react';
 import {editor} from "monaco-editor/esm/vs/editor/editor.api";
@@ -70,7 +71,7 @@ export function App() {
 
   const [action, setAction] = useState<ContentAction>(null);
 
-  const [markupProperties, setMarkupProperties] = useState<string[]>();
+  const [markupProperties, setMarkupProperties] = useState<string[]>([]);
   const [activeProperty, setActiveProperty] = useState<string>();
 
   const workAreaService = useService(createWorkAreaServiceDescriptor());
@@ -98,6 +99,11 @@ export function App() {
     if (openedContents && !activeContentId) {
       setActiveContentId(openedContents[0]);
     }
+    if (!openedContents || openedContents.length == 0) {
+      setMarkupProperties([]);
+      setActiveContentId(null);
+      setActiveProperty(null);
+    }
   }, [openedContents]);
 
   const editorRef = useRef<IDiffEditor>(null);
@@ -115,19 +121,20 @@ export function App() {
     if (action && activeContent) {
       switch (action) {
         case ContentAction.Revert:
-          activeContent.revert().then(() => setAction(null)).catch(errorMsg);
+          activeContent.revert().catch(errorMsg);
           break;
         case ContentAction.Checkin:
-          activeContent.checkIn().then(() => setAction(null)).catch(errorMsg);
+          activeContent.checkIn().catch(errorMsg);
           break;
         case ContentAction.Checkout:
-          activeContent.checkOut().then(() => setAction(null)).catch(errorMsg);
+          activeContent.checkOut().catch(errorMsg);
           break;
         default:
-          setAction(null);
+          console.error(`Unknown action '${action}'`);
       }
+      setAction(null);
     }
-  }, [action, activeContent]);
+  }, [action]);
 
   function isMarkup(markup: any): markup is Markup {
     return markup && markup.asXml;
@@ -145,12 +152,11 @@ export function App() {
   }
 
   async function loadContent(contentPath: string) {
+    if (!contentPath) return;
     let s = await getSession();
     const contentRepository: ContentRepository = s.getConnection().getContentRepository()
     const content = contentRepository.getContent(contentPath)
-    if (!content) {
-      return;
-    }
+    if (!content) return;
 
     const onCheckedOutChange = (event: PropertyChangeEvent) => setCheckedOut(event.newValue);
     content.addPropertyChangeListener('checkedOut', onCheckedOutChange);
@@ -222,16 +228,19 @@ export function App() {
             <Nav/>
             <Container maxWidth='100vw' p='16px' bgColor='#e9f3f7' shadow='sm'>
               <HStack spacing='16px'>
-                {openedContents?.map(c =>
-                        <ContentCard id={c} key={c} active={activeContentId === c} onClick={setActiveContentId} /> )}
-              </HStack>
-              <Select
-                      onChange={(e) => setActiveProperty(e.target.value)}
-                      value={activeProperty} mt='16px' bgColor='#FFF'
-                      hidden={markupProperties?.length == 0}
-              >
-                {markupProperties?.map(m => <option key={m} value={m}>Markup Property: {m}</option>)}
-              </Select>
+                {openedContents?.length > 0 ?
+                  openedContents.map(c => <ContentCard id={c} key={c} active={activeContentId === c} onClick={setActiveContentId} /> )
+                  : <EmptyWorkAreaCard />
+                }
+                </HStack>
+              {markupProperties.length > 0 &&
+                <Select
+                        onChange={(e) => setActiveProperty(e.target.value)}
+                        value={activeProperty} mt='16px' bgColor='#FFF'
+                >
+                  {markupProperties.map(m => <option key={m} value={m}>Markup Property: {m}</option>)}
+                </Select>
+              }
             </Container>
             <Box py='2' />
             <Text>Links: {originalVersionNumber}     ----------     Rechts: {originalVersionNumber + 1} {checkedOut && '*'}</Text>
