@@ -1,12 +1,6 @@
 import React, {useEffect, useRef, useState} from 'react'
 
-import {
-  ChakraProvider,
-  Container,
-  HStack,
-  Select,
-  useToast
-} from '@chakra-ui/react'
+import {ChakraProvider, Container, HStack, Select, useToast} from '@chakra-ui/react'
 import {createWorkAreaServiceDescriptor} from "@coremedia/studio-client.form-services-api/WorkAreaServiceDescriptor";
 
 import {ContentCard} from "./ContentCard";
@@ -17,15 +11,17 @@ import {NoMarkupView} from "./NoMarkupView";
 
 import {DiffEditor} from '@monaco-editor/react';
 import {editor} from "monaco-editor/esm/vs/editor/editor.api";
-import {useService, getSession, loadRemoteBean} from "./cm-utils";
+import {getSession, loadRemoteBean, useService} from "./cm-utils";
 import ContentRepository from "@coremedia/studio-client.cap-rest-client/content/ContentRepository";
 import Markup from "@coremedia/studio-client.client-core/data/Markup";
 import Content from "@coremedia/studio-client.cap-rest-client/content/Content";
-import {checkInAction, checkOutAction, ContentAction, revertAction} from "./EditorActions";
+import {addEditorActions, ContentAction} from "./EditorActions";
+import PropertyChangeEvent from "@coremedia/studio-client.client-core/data/PropertyChangeEvent";
+import MarkupImpl from "@coremedia/studio-client.client-core-impl/data/impl/MarkupImpl";
 import IDiffEditor = editor.IDiffEditor;
 import IDiffEditorConstructionOptions = editor.IDiffEditorConstructionOptions;
 import IStandaloneDiffEditor = editor.IStandaloneDiffEditor;
-import PropertyChangeEvent from "@coremedia/studio-client.client-core/data/PropertyChangeEvent";
+import RemoteError from "@coremedia/studio-client.client-core/data/error/RemoteError";
 
 const EDITOR_OPTIONS: IDiffEditorConstructionOptions = { wordWrap: 'on', diffWordWrap: 'on', glyphMargin: true };
 
@@ -79,15 +75,13 @@ export function App() {
   function handleEditorDidMount(editor: IStandaloneDiffEditor, monaco) {
     console.log('editor did mount!')
     editorRef.current = editor;
-
-    editor.addAction(revertAction(setAction));
-    editor.addAction(checkInAction(setAction));
-    editor.addAction(checkOutAction(setAction));
+    addEditorActions(editor, setAction);
   }
 
   useEffect(() => {
-    const errorMsg = () => toast({ title: 'Operation has failed.', status: 'error'});
     if (action && activeContent) {
+      const errorMsg = (e: RemoteError) => toast({ title: `Operation ${action} has failed.`, status: 'error',
+        isClosable: true, description: e?.errorCode || ''});
       switch (action) {
         case ContentAction.Revert:
           activeContent.revert().catch(errorMsg);
@@ -97,6 +91,19 @@ export function App() {
           break;
         case ContentAction.Checkout:
           activeContent.checkOut().catch(errorMsg);
+          break;
+        case ContentAction.Save:
+          let markupValue = editorRef.current.getModifiedEditor().getModel().getValue();
+          let markup = MarkupImpl.createLoadedMarkup(markupValue);
+
+          const reloadContentAndFlush = (content: Content, markup: Markup) => {
+            content.load().then(() => {
+              content.getProperties().set(activeProperty, markup);
+              content.flush().catch(errorMsg)
+            });
+          }
+          (checkedOut ? Promise.resolve() : activeContent.checkOut())
+                  .then(() => reloadContentAndFlush(activeContent, markup));
           break;
         default:
           console.error(`Unknown action '${action}'`);
