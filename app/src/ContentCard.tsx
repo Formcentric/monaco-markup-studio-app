@@ -1,9 +1,10 @@
 import {Box, Heading, Text} from "@chakra-ui/react";
 import React, {useEffect, useState} from 'react'
 
-import {getSession} from "./cm-utils";
+import {getSession, useService} from "./cm-utils";
 import Content from '@coremedia/studio-client.cap-rest-client/content/Content'
 import PropertyChangeEvent from "@coremedia/studio-client.client-core/data/PropertyChangeEvent";
+import {createWorkAreaServiceDescriptor} from "@coremedia/studio-client.form-services-api/WorkAreaServiceDescriptor";
 
 type ContentCardProps = {
   id: string;
@@ -39,8 +40,13 @@ export const ContentCard = ({id, active, onClick}: ContentCardProps) => {
 
   const clickHandler = () => onClick ? onClick(id) : null;
 
+  const workAreaService = useService(createWorkAreaServiceDescriptor());
+  const openEntityHandler = () => {
+    workAreaService.openEntitiesInTabs([id]);
+  }
+
   return (
-          <Box p={5} shadow='md' borderWidth='1px' onClick={clickHandler} bg={bgColor} textColor={textColor} cursor='pointer'>
+          <Box p={5} shadow='md' borderWidth='1px' onDoubleClick={openEntityHandler} onClick={clickHandler} bg={bgColor} textColor={textColor} cursor='pointer'>
             <Heading fontSize='xl'>{content?.getName()}{checkedOut && '*'}</Heading>
             <Text mt={2}>{content?.getType().getName()}</Text>
             <Text mt={0}>{id}</Text>
