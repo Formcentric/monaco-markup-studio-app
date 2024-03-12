@@ -18,7 +18,7 @@ export function Nav() {
                 <Link href='https://formcentric.com' isExternal>
                   <Button colorScheme='gray' rightIcon={<ExternalLinkIcon />}>Formcentric</Button>
                 </Link>
-                <Link href='https://github.com' isExternal>
+                <Link href='https://github.com/Formcentric/monaco-markup-studio-app' isExternal>
                   <Button colorScheme='gray' rightIcon={<ExternalLinkIcon />}>Monaco Markup on GitHub</Button>
                 </Link>
               </ButtonGroup>
