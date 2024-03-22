@@ -27,7 +27,7 @@ Talk to us today about your needs and requirements: [www.monday-consulting.com](
 
 ## Setup / Quick Start
 
-This section assumes that a CoreMedia Blueprint in version 2401.2 is available and that the `studio-client` app can
+This section assumes that a CoreMedia Blueprint in version 2401.3 is available and that the `studio-client` app can
 be successfully built using `pnpm`.
 
 1. **Navigate to the `studio-client` app directory:**
